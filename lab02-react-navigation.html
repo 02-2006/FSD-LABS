@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lab 02: React Navigation</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+    .app-wrapper { max-width: 860px; margin: 0 auto; padding: 40px 20px; }
+
+    h1 { font-size: 32px; font-weight: 700; color: #1a1a2e; text-align: center; }
+    .subtitle { text-align: center; color: #666; margin-top: 6px; font-size: 15px; }
+
+    .nav { display: flex; justify-content: center; gap: 12px; margin: 28px 0; flex-wrap: wrap; }
+    .nav button {
+      padding: 10px 28px; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; color: #fff;
+    }
+    .nav button:hover { transform: translateY(-2px); opacity: 0.9; }
+    .nav button.active { box-shadow: 0 4px 14px rgba(0,0,0,0.25); transform: translateY(-2px); }
+    .btn-home    { background: #3b82f6; }
+    .btn-about   { background: #22c55e; }
+    .btn-contact { background: #a855f7; }
+    .btn-home.active    { background: #1d4ed8; }
+    .btn-about.active   { background: #15803d; }
+    .btn-contact.active { background: #7e22ce; }
+
+    .url-bar {
+      background: #e8f0fe; border-left: 4px solid #3b82f6;
+      border-radius: 6px; padding: 12px 16px; margin-bottom: 20px;
+      font-size: 13px; color: #1e40af;
+    }
+    .url-bar strong { font-weight: 700; }
+
+    .task-box {
+      background: #eff6ff; border-left: 4px solid #3b82f6;
+      border-radius: 6px; padding: 12px 16px; margin-bottom: 24px;
+      font-size: 14px; color: #1e3a5f;
+    }
+
+    .page-card {
+      background: #fff; border-radius: 14px;
+      padding: 32px; margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+    .page-card h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; }
+    .page-card p  { color: #555; line-height: 1.7; margin-bottom: 12px; font-size: 15px; }
+
+    .badge {
+      display: inline-block; font-size: 11px; font-weight: 700;
+      padding: 3px 10px; border-radius: 20px; margin-bottom: 14px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .badge-func  { background: #dbeafe; color: #1d4ed8; }
+    .badge-class { background: #fce7f3; color: #9d174d; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 16px; }
+    .feature-item { background: #f8fafc; border-radius: 10px; padding: 14px; border: 1px solid #e2e8f0; }
+    .feature-item .icon { font-size: 22px; margin-bottom: 6px; }
+    .feature-item h4 { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 4px; }
+    .feature-item p { font-size: 12px; color: #666; margin: 0; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+    .form-group input, .form-group textarea {
+      width: 100%; padding: 10px 14px; border: 1px solid #d1d5db;
+      border-radius: 8px; font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-group input:focus, .form-group textarea:focus { border-color: #a855f7; }
+    .form-group textarea { resize: vertical; min-height: 90px; }
+    .submit-btn {
+      background: #a855f7; color: #fff; border: none;
+      padding: 10px 24px; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: background 0.2s;
+    }
+    .submit-btn:hover { background: #7e22ce; }
+    .success-msg { background: #dcfce7; color: #166534; border-radius: 8px; padding: 12px 16px; margin-top: 14px; font-size: 14px; }
+
+    .team-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 14px; margin-top: 16px; }
+    .team-card { background: #f8fafc; border-radius: 10px; padding: 16px; text-align: center; border: 1px solid #e2e8f0; }
+    .avatar { width: 52px; height: 52px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700; color: #fff; margin: 0 auto 10px; }
+    .team-card h4 { font-size: 13px; font-weight: 700; color: #1a1a2e; margin-bottom: 2px; }
+    .team-card p  { font-size: 11px; color: #888; margin: 0; }
+
+    .concept-box {
+      background: #fff; border-radius: 14px; padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+    .concept-box h3 { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: #1a1a2e; }
+    .concept-list { list-style: none; }
+    .concept-list li { padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 14px; color: #374151; }
+    .concept-list li:last-child { border: none; }
+    .concept-list li strong { color: #1a1a2e; }
+    .concept-list li span { color: #666; }
+
+    .component-type-tag {
+      float: right; font-size: 11px; background: #fef3c7; color: #92400e;
+      padding: 2px 8px; border-radius: 20px; font-weight: 600;
+    }
+
+    .counter-box { display: flex; align-items: center; gap: 14px; margin: 16px 0; }
+    .counter-box button { background: #3b82f6; color: #fff; border: none; width: 36px; height: 36px; border-radius: 8px; font-size: 20px; cursor: pointer; font-weight: 700; }
+    .counter-box span { font-size: 28px; font-weight: 800; color: #1a1a2e; min-width: 40px; text-align: center; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, Component } = React;
+
+// ─── FUNCTION COMPONENT: Home Page ───────────────────────────────────────────
+function HomePage() {
+  const [count, setCount] = useState(0);
+  const [time, setTime] = useState(new Date().toLocaleTimeString());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <div className="page-card">
+      <span className="badge badge-func">Function Component</span>
+      <h2 style={{color:'#1d4ed8'}}>Welcome Home</h2>
+      <p>This page is built as a <strong>Function Component</strong> using React Hooks (<code>useState</code> and <code>useEffect</code>).</p>
+      <p>Current time: <strong style={{color:'#3b82f6'}}>{time}</strong> — updated every second using <code>useEffect</code>.</p>
+
+      <div className="counter-box">
+        <button onClick={() => setCount(c => Math.max(0, c-1))}>-</button>
+        <span>{count}</span>
+        <button onClick={() => setCount(c => c+1)}>+</button>
+      </div>
+      <p style={{fontSize:13,color:'#888'}}>Counter uses <code>useState</code> hook — no class needed!</p>
+
+      <div className="feature-grid">
+        {[
+          { icon:'⚡', title:'Fast Rendering', desc:'Virtual DOM updates only what changed' },
+          { icon:'🔗', title:'React Router', desc:'Client-side navigation without reload' },
+          { icon:'🎣', title:'React Hooks', desc:'useState, useEffect in function components' },
+          { icon:'🧩', title:'Components', desc:'Reusable building blocks for UI' },
+        ].map(f => (
+          <div className="feature-item" key={f.title}>
+            <div className="icon">{f.icon}</div>
+            <h4>{f.title}</h4>
+            <p>{f.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── CLASS COMPONENT: About Page ─────────────────────────────────────────────
+class AboutPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { expanded: null };
+  }
+
+  toggleMember(name) {
+    this.setState(prev => ({ expanded: prev.expanded === name ? null : name }));
+  }
+
+  render() {
+    const team = [
+      { name:'Alice Chen', role:'Lead Dev', color:'#3b82f6', initials:'AC', bio:'Full-stack engineer with 8 years experience in React and Node.js.' },
+      { name:'Bob Smith', role:'UI/UX', color:'#22c55e', initials:'BS', bio:'Designs clean, accessible interfaces with a focus on user experience.' },
+      { name:'Carol Ray', role:'Backend', color:'#a855f7', initials:'CR', bio:'Specializes in scalable APIs, databases, and cloud infrastructure.' },
+      { name:'Dan Park', role:'DevOps', color:'#f59e0b', initials:'DP', bio:'Keeps the CI/CD pipeline smooth and the servers always running.' },
+    ];
+
+    return (
+      <div className="page-card">
+        <span className="badge badge-class">Class Component</span>
+        <h2 style={{color:'#15803d'}}>About Us</h2>
+        <p>This page uses a <strong>Class Component</strong> with <code>this.state</code> and <code>this.setState()</code> — the original React pattern.</p>
+        <p>Click a team member to expand their bio:</p>
+
+        <div className="team-grid">
+          {team.map(m => (
+            <div key={m.name}>
+              <div className="team-card" onClick={() => this.toggleMember(m.name)}
+                style={{cursor:'pointer', borderColor: this.state.expanded===m.name ? m.color : '#e2e8f0', transition:'border-color 0.2s'}}>
+                <div className="avatar" style={{background:m.color}}>{m.initials}</div>
+                <h4>{m.name}</h4>
+                <p>{m.role}</p>
+              </div>
+              {this.state.expanded === m.name && (
+                <div style={{background:'#f8fafc',borderRadius:8,padding:'10px 12px',marginTop:6,fontSize:13,color:'#374151',border:'1px solid '+m.color}}>
+                  {m.bio}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div style={{marginTop:20,padding:'14px 16px',background:'#fef9c3',borderRadius:8,fontSize:13,color:'#713f12'}}>
+          <strong>Class vs Function:</strong> Both work! Modern React prefers function components with hooks, but class components are still valid and widely used in legacy code.
+        </div>
+      </div>
+    );
+  }
+}
+
+// ─── CLASS COMPONENT: Contact Page ───────────────────────────────────────────
+class ContactPage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { name:'', email:'', message:'', submitted:false, errors:{} };
+    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  handleChange(e) {
+    this.setState({ [e.target.name]: e.target.value, errors:{} });
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const { name, email, message } = this.state;
+    const errors = {};
+    if (!name.trim()) errors.name = 'Name is required';
+    if (!email.includes('@')) errors.email = 'Valid email required';
+    if (!message.trim()) errors.message = 'Message cannot be empty';
+    if (Object.keys(errors).length > 0) { this.setState({ errors }); return; }
+    this.setState({ submitted:true });
+  }
+
+  render() {
+    const { name, email, message, submitted, errors } = this.state;
+    return (
+      <div className="page-card">
+        <span className="badge badge-class">Class Component</span>
+        <h2 style={{color:'#7e22ce'}}>Contact Us</h2>
+        <p>This form is a <strong>Class Component</strong> with controlled inputs, validation, and <code>this.handleSubmit()</code>.</p>
+
+        {submitted ? (
+          <div className="success-msg">
+            Message sent successfully! Thanks <strong>{name}</strong>, we will reach out to <strong>{email}</strong> soon.
+          </div>
+        ) : (
+          <form onSubmit={this.handleSubmit}>
+            <div className="form-group">
+              <label>Your Name</label>
+              <input name="name" value={name} onChange={this.handleChange} placeholder="John Doe" />
+              {errors.name && <span style={{color:'#dc2626',fontSize:12}}>{errors.name}</span>}
+            </div>
+            <div className="form-group">
+              <label>Email Address</label>
+              <input name="email" value={email} onChange={this.handleChange} placeholder="john@example.com" />
+              {errors.email && <span style={{color:'#dc2626',fontSize:12}}>{errors.email}</span>}
+            </div>
+            <div className="form-group">
+              <label>Message</label>
+              <textarea name="message" value={message} onChange={this.handleChange} placeholder="Write your message here..." />
+              {errors.message && <span style={{color:'#dc2626',fontSize:12}}>{errors.message}</span>}
+            </div>
+            <button type="submit" className="submit-btn">Send Message</button>
+          </form>
+        )}
+      </div>
+    );
+  }
+}
+
+// ─── FUNCTION COMPONENT: Main App (simulates React Router) ───────────────────
+function App() {
+  const [route, setRoute] = useState('home');
+
+  const routes = { home: '/', about: '/about', contact: '/contact' };
+
+  function navigate(page) {
+    setRoute(page);
+    window.history.pushState({}, '', routes[page]);
+  }
+
+  useEffect(() => {
+    const path = window.location.pathname;
+    if (path === '/about') setRoute('about');
+    else if (path === '/contact') setRoute('contact');
+    else setRoute('home');
+  }, []);
+
+  return (
+    <div className="app-wrapper">
+      <h1>Lab 02: React Navigation</h1>
+      <p className="subtitle">Switch between components using React Router</p>
+
+      <div className="nav">
+        <button className={`btn-home ${route==='home'?'active':''}`} onClick={() => navigate('home')}>Home</button>
+        <button className={`btn-about ${route==='about'?'active':''}`} onClick={() => navigate('about')}>About</button>
+        <button className={`btn-contact ${route==='contact'?'active':''}`} onClick={() => navigate('contact')}>Contact</button>
+      </div>
+
+      <div className="url-bar">
+        <strong>Current URL:</strong> {routes[route]} — page switches without full reload
+      </div>
+
+      <div className="task-box">
+        <strong>Lab Task:</strong> Click the buttons above. Notice how the URL changes without the page refreshing. Each page is a different React component type.
+      </div>
+
+      {route === 'home'    && <HomePage />}
+      {route === 'about'   && <AboutPage />}
+      {route === 'contact' && <ContactPage />}
+
+      <div className="concept-box">
+        <h3>Quick Concept Recap</h3>
+        <ul className="concept-list">
+          <li>
+            <span className="component-type-tag">Router Concept</span>
+            <strong>BrowserRouter</strong> — <span>Keeps your UI in sync with the URL</span>
+          </li>
+          <li>
+            <span className="component-type-tag">Router Concept</span>
+            <strong>Routes &amp; Route</strong> — <span>Map a specific path (like /about) to a component</span>
+          </li>
+          <li>
+            <span className="component-type-tag">Router Concept</span>
+            <strong>Link</strong> — <span>Used instead of &lt;a&gt; tags to prevent full page reloads</span>
+          </li>
+          <li>
+            <span className="component-type-tag">Function Component</span>
+            <strong>useState / useEffect</strong> — <span>Hooks for state and side effects in function components</span>
+          </li>
+          <li>
+            <span className="component-type-tag">Class Component</span>
+            <strong>this.state / this.setState()</strong> — <span>State management in class-based components</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
